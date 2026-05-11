@@ -47,4 +47,7 @@ public class Reserva {
 
     @Column(name = "observaciones", length = 255)
     private String observaciones;
+
+    @Column(name = "dias_prestamo")
+    private Integer diasPrestamo;
 }

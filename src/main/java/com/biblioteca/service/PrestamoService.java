@@ -92,11 +92,16 @@ public class PrestamoService {
     // Llamado desde ReservaService al aprobar una reserva
     @Transactional
     public void crearDesdereserva(Reserva reserva, Cuenta aprobadoPor) {
-        int diasPrestamo = switch (aprobadoPor.getRol().getNombre()) {
-            case "admin" -> DIAS_PRESTAMO_ADMIN;
-            case "bibliotecario" -> DIAS_PRESTAMO_BIBLIOTECARIO;
-            default -> DIAS_PRESTAMO_ESTUDIANTE;
-        };
+        int diasPrestamo;
+        if (reserva.getDiasPrestamo() != null && reserva.getDiasPrestamo() > 0) {
+            diasPrestamo = reserva.getDiasPrestamo();
+        } else {
+            diasPrestamo = switch (aprobadoPor.getRol().getNombre()) {
+                case "admin" -> DIAS_PRESTAMO_ADMIN;
+                case "bibliotecario" -> DIAS_PRESTAMO_BIBLIOTECARIO;
+                default -> DIAS_PRESTAMO_ESTUDIANTE;
+            };
+        }
 
         Prestamo prestamo = new Prestamo();
         prestamo.setUsuario(reserva.getUsuario());

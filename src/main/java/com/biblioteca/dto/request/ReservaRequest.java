@@ -11,4 +11,6 @@ public class ReservaRequest {
 
     @NotNull(message = "La biblioteca es obligatoria")
     private Integer idBiblioteca;
+
+    private Integer diasPrestamo;
 }

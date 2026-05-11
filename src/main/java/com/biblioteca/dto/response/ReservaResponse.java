@@ -25,4 +25,5 @@ public class ReservaResponse {
     private LocalDate fechaExpiracion;
     private String estado;
     private String observaciones;
+    private Integer diasPrestamo;
 }

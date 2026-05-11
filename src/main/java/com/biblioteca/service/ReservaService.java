@@ -81,6 +81,7 @@ public class ReservaService {
         reserva.setFechaReserva(LocalDateTime.now());
         reserva.setFechaExpiracion(LocalDate.now().plusDays(3));
         reserva.setEstado("pendiente");
+        reserva.setDiasPrestamo(request.getDiasPrestamo() != null ? request.getDiasPrestamo() : 7);
 
         return toResponse(reservaRepository.save(reserva));
     }
@@ -174,6 +175,7 @@ public class ReservaService {
                 .fechaExpiracion(r.getFechaExpiracion())
                 .estado(r.getEstado())
                 .observaciones(r.getObservaciones())
+                .diasPrestamo(r.getDiasPrestamo())
                 .build();
     }
 }
