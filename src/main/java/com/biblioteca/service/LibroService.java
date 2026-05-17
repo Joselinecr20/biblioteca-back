@@ -1,6 +1,7 @@
 package com.biblioteca.service;
 
 import com.biblioteca.dto.request.LibroRequest;
+import com.biblioteca.dto.request.StockRequest;
 import com.biblioteca.dto.response.LibroResponse;
 import com.biblioteca.exception.BusinessException;
 import com.biblioteca.exception.ResourceNotFoundException;
@@ -20,6 +21,7 @@ public class LibroService {
     private final LibroRepository libroRepository;
     private final CategoriaRepository categoriaRepository;
     private final AutorRepository autorRepository;
+    private final BibliotecaRepository bibliotecaRepository;
     private final LibroBibliotecaRepository libroBibliotecaRepository;
     private final ReservaRepository reservaRepository;
     private final PrestamoRepository prestamoRepository;
@@ -149,6 +151,38 @@ public class LibroService {
         libroRepository.delete(libro);
     }
 
+    @Transactional
+    public LibroResponse setStock(Integer idLibro, List<StockRequest.StockItem> items) {
+        Libro libro = libroRepository.findById(idLibro)
+                .orElseThrow(() -> new ResourceNotFoundException("Libro", idLibro));
+
+        for (StockRequest.StockItem item : items) {
+            Biblioteca biblioteca = bibliotecaRepository.findById(item.getIdBiblioteca())
+                    .orElseThrow(() -> new ResourceNotFoundException("Biblioteca", item.getIdBiblioteca()));
+
+            LibroBiblioteca lb = libroBibliotecaRepository
+                    .findByLibroAndBiblioteca(libro, biblioteca)
+                    .orElseGet(() -> {
+                        LibroBiblioteca n = new LibroBiblioteca();
+                        n.setLibro(libro);
+                        n.setBiblioteca(biblioteca);
+                        n.setCantidadDisponible(item.getCantidadTotal());
+                        return n;
+                    });
+
+            if (lb.getIdLibroBiblioteca() != null) {
+                int totalOld   = lb.getCantidadTotal()      != null ? lb.getCantidadTotal()      : 0;
+                int dispOld    = lb.getCantidadDisponible() != null ? lb.getCantidadDisponible() : 0;
+                int prestados  = totalOld - dispOld;
+                lb.setCantidadDisponible(Math.max(0, item.getCantidadTotal() - prestados));
+            }
+            lb.setCantidadTotal(item.getCantidadTotal());
+            libroBibliotecaRepository.save(lb);
+        }
+
+        return toResponse(libroRepository.findById(idLibro).get());
+    }
+
     public LibroResponse toResponse(Libro libro) {
         List<String> autores = libro.getLibroAutores().stream()
                 .map(la -> la.getAutor().getNombre() + " " + la.getAutor().getApellido())
@@ -168,6 +202,16 @@ public class LibroService {
                 .mapToInt(lb -> lb.getCantidadDisponible() != null ? lb.getCantidadDisponible() : 0)
                 .sum();
 
+        List<LibroResponse.BibliotecaDto> bibliotecas = libro.getLibrosBibliotecas().stream()
+                .filter(lb -> lb.getCantidadDisponible() != null && lb.getCantidadDisponible() > 0)
+                .map(lb -> LibroResponse.BibliotecaDto.builder()
+                        .idBiblioteca(lb.getBiblioteca().getIdBiblioteca())
+                        .nombre(lb.getBiblioteca().getNombre())
+                        .cantidadDisponible(lb.getCantidadDisponible())
+                        .cantidadTotal(lb.getCantidadTotal())
+                        .build())
+                .collect(Collectors.toList());
+
         return LibroResponse.builder()
                 .idLibro(libro.getIdLibro())
                 .titulo(libro.getTitulo())
@@ -176,10 +220,12 @@ public class LibroService {
                 .descripcion(libro.getDescripcion())
                 .portadaUrl(libro.getPortadaUrl())
                 .isbn(libro.getIsbn())
+                .idCategoria(libro.getCategoria() != null ? libro.getCategoria().getIdCategoria() : null)
                 .categoria(libro.getCategoria() != null ? libro.getCategoria().getNombre() : null)
                 .autores(autores)
                 .imagenes(imagenes)
                 .cantidadDisponible(disponible)
+                .bibliotecas(bibliotecas)
                 .build();
     }
 }

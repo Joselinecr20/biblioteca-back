@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 public interface LibroBibliotecaRepository extends JpaRepository<LibroBiblioteca, Integer> {
     Optional<LibroBiblioteca> findByLibroAndBiblioteca(Libro libro, Biblioteca biblioteca);
+    boolean existsByBiblioteca(Biblioteca biblioteca);
     void deleteAllByLibro(Libro libro);
     List<LibroBiblioteca> findByCantidadDisponibleLessThanEqual(Integer cantidad);
 

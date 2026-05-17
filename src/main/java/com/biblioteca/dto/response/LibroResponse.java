@@ -19,6 +19,7 @@ public class LibroResponse {
     private String descripcion;
     private String portadaUrl;
     private String isbn;
+    private Integer idCategoria;
     private String categoria;
     private List<String> autores;
     private List<ImagenDto> imagenes;
@@ -35,4 +36,17 @@ public class LibroResponse {
         private Integer orden;
         private String descripcion;
     }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BibliotecaDto {
+        private Integer idBiblioteca;
+        private String nombre;
+        private Integer cantidadDisponible;
+        private Integer cantidadTotal;
+    }
+
+    private List<BibliotecaDto> bibliotecas;
 }

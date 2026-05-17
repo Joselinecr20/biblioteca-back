@@ -1,6 +1,7 @@
 package com.biblioteca.controller;
 
 import com.biblioteca.dto.request.LibroRequest;
+import com.biblioteca.dto.request.StockRequest;
 import com.biblioteca.dto.response.ApiResponse;
 import com.biblioteca.dto.response.LibroResponse;
 import com.biblioteca.service.LibroService;
@@ -43,6 +44,13 @@ public class LibroController {
                                                               @Valid @RequestBody LibroRequest request) {
         return ResponseEntity.ok(
                 ApiResponse.ok("Libro actualizado exitosamente", libroService.update(id, request)));
+    }
+
+    @PutMapping("/{id}/stock")
+    public ResponseEntity<ApiResponse<LibroResponse>> setStock(@PathVariable Integer id,
+                                                               @Valid @RequestBody StockRequest request) {
+        return ResponseEntity.ok(
+                ApiResponse.ok("Stock actualizado exitosamente", libroService.setStock(id, request.getItems())));
     }
 
     @DeleteMapping("/{id}")

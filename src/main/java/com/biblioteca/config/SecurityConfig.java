@@ -73,6 +73,18 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/multas/mis").hasAnyAuthority("ROLE_admin", "ROLE_estudiante")
                 .requestMatchers(HttpMethod.PUT, "/multas/*/pagar").hasAnyAuthority("ROLE_admin", "ROLE_bibliotecario")
 
+                // Categorías
+                .requestMatchers(HttpMethod.GET,    "/categorias").authenticated()
+                .requestMatchers(HttpMethod.POST,   "/categorias").hasAuthority("ROLE_admin")
+                .requestMatchers(HttpMethod.PUT,    "/categorias/**").hasAuthority("ROLE_admin")
+                .requestMatchers(HttpMethod.DELETE, "/categorias/**").hasAuthority("ROLE_admin")
+
+                // Bibliotecas
+                .requestMatchers(HttpMethod.GET,    "/bibliotecas").hasAnyAuthority("ROLE_admin", "ROLE_bibliotecario")
+                .requestMatchers(HttpMethod.POST,   "/bibliotecas").hasAuthority("ROLE_admin")
+                .requestMatchers(HttpMethod.PUT,    "/bibliotecas/**").hasAuthority("ROLE_admin")
+                .requestMatchers(HttpMethod.DELETE, "/bibliotecas/**").hasAuthority("ROLE_admin")
+
                 // Dashboard
                 .requestMatchers(HttpMethod.GET, "/dashboard/admin").hasAuthority("ROLE_admin")
                 .requestMatchers(HttpMethod.GET, "/dashboard/bibliotecario").hasAnyAuthority("ROLE_admin", "ROLE_bibliotecario")
