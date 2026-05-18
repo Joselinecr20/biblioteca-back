@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(Get-ChildItem -Path \"C:\\\\xampp\\\\htdocs\\\\\" -Directory | Select-Object Name)",
-      "Read(//c/xampp/htdocs/**)"
-    ]
-  }
-}
